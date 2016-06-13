@@ -3,9 +3,9 @@
 
 /**
  * TODO
- * [ ] Allow keyboard control
+ * [x] Allow keyboard control
  * [ ] Add maze exit
- * [ ] Color the background once the "ball" has left an open square
+ * [x] Color the background once the "ball" has left an open square
  * [ ] Create a "level select" scene; allow changing size of maze
  */
 
@@ -31,6 +31,36 @@
 
     GameScene.prototype.update = function (delta) {
         Arcadia.Scene.prototype.update.call(this, delta);
+
+        var keyboardRotationSpeed = 2;
+
+        if (this.rotateLeft) {
+            this.maze.rotation -= keyboardRotationSpeed * delta;
+        }
+
+        if (this.rotateRight) {
+            this.maze.rotation += keyboardRotationSpeed * delta;
+        }
+    };
+
+    GameScene.prototype.onKeyDown = function (key) {
+        if (key === 'left') {
+            this.rotateLeft = true;
+        }
+
+        if (key === 'right') {
+            this.rotateRight = true;
+        }
+    };
+
+    GameScene.prototype.onKeyUp = function (key) {
+        if (key === 'left') {
+            this.rotateLeft = false;
+        }
+
+        if (key === 'right') {
+            this.rotateRight = false;
+        }
     };
 
     GameScene.prototype.onPointStart = function (points) {
