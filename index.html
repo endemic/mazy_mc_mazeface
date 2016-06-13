@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Maze</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!-- App manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Standalone app tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" sizes="192x192" href="assets/icons/192.png">
+
+    <!-- Proprietary Apple tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Shikaku">
+
+    <link rel="apple-touch-startup-image" href="assets/images/splash.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="assets/icons/120.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/180.png">
+
+    <!-- favicon, yo -->
+    <link rel="shortcut icon" href="assets/icons/favicon.ico">
+    <link rel="icon" type="image/png" href="assets/icons/favicon.png">
+
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+            background: #ddd;
+            cursor: pointer;
+        }
+        body,
+        #arcadia,
+        #arcadia canvas {
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+    </style>
+
+    <!-- engine -->
+    <script src="node_modules/arcadia/dist/arcadia.js"></script>
+    <script src="node_modules/sona/dist/sona.js"></script>
+
+    <!-- polyfills, etc. -->
+    <!-- <script src="src/lib/storage-extensions.js"></script>
+    <script src="src/lib/polyfills.js"></script>
+    <script src="src/lib/arcadia-extensions.js"></script> -->
+
+    <!-- puzzle data -->
+    <!-- <script src="src/data/levels.js"></script>
+    <script src="src/data/tutorials.js"></script> -->
+
+    <!-- objects -->
+    <script src="src/objects/maze.js"></script>
+
+    <!-- scenes -->
+    <script src="src/scenes/game.js"></script>
+
+    <script>
+        window.onload = function () {
+            window.game = new Arcadia.Game({
+                width: 375,
+                height: 667,
+                scene: GameScene,
+                scaleToFit: true
+            });
+        };
+    </script>
+  </head>
+  <body></body>
+</html>
