@@ -10,11 +10,11 @@
         Arcadia.Shape.apply(this, arguments);
 
         this.mazeData = [];
-        this.mazeSize = options.mazeSize || 50;
+        this.mazeSize = options.mazeSize || 20;
         var start = this.mazeSize + 2;
 
         while (this.mazeData.length < Math.pow(this.mazeSize, 2)) {
-            this.mazeData.push(1);  // solid block
+            this.mazeData.push(Maze.WALL);
         }
 
         // Carve maze here
@@ -76,7 +76,7 @@
             }
 
             // If so, carve, then move on
-            data[index] = 0;
+            data[index] = Maze.EMPTY;
 
             // randomly decide which direction to move first
             directions.sort(function (a, b) {
@@ -89,6 +89,21 @@
         // TODO: don't hard-code the starting spot
         // or do, see if I care
         carve(start, this.mazeData);
+
+        // Find the finish spot -- try the opposite side of the puzzle
+        // This is a stupid algorithm
+        function createFinish(index, data) {
+            if (data[index] === Maze.EMPTY) {
+                data[index] = Maze.FINISH;
+                return;
+            }
+
+            var next = index - 1;
+            createFinish(next, data);
+        }
+
+        var finish = this.mazeData.length - this.mazeSize - 2;
+        createFinish(finish, this.mazeData);
 
         var pixelSize = this.size.width / this.mazeSize;
         var originX = -this.size.width / 2;
@@ -108,6 +123,12 @@
         this.add(this.ball);
     };
 
+    Maze.EMPTY = 0;
+    Maze.WALL = 1;
+    Maze.VISITED = 2;
+    Maze.START = 8;
+    Maze.FINISH = 9;
+
     Maze.prototype = new Arcadia.Shape();
 
     Maze.prototype.path = function (context) {
@@ -117,15 +138,22 @@
         var originX = -this.size.width / 2 * Arcadia.PIXEL_RATIO;
         var originY = -this.size.height / 2 * Arcadia.PIXEL_RATIO;
 
-        context.fillStyle = this.color;
-
         this.mazeData.forEach(function (value, index) {
-            if (value !== 1) {
+            if (value === Maze.EMPTY) {
                 return;
             }
 
             var x = index % size;
             var y = Math.floor(index / size);
+
+            // TODO: don't hard-code these colors
+            var colors = {};
+            colors[Maze.WALL] = 'red';
+            colors[Maze.VISITED] = 'lightblue';
+            colors[Maze.START] = 'purple';
+            colors[Maze.FINISH] = 'green';
+
+            context.fillStyle = colors[value];
 
             context.fillRect(originX + (x * pixelSize),
                              originY + (y * pixelSize),
@@ -153,7 +181,7 @@
 
         this.ball.position.x += gravity.x;
         this.mazeData.forEach(function (value, index) {
-            if (collision || value !== 1) {
+            if (collision || value !== Maze.WALL) {
                 return;
             }
 
@@ -174,6 +202,10 @@
             }
             if (this.ball.collidesWith(other)) {
                 collision = true;
+
+                if (value === Maze.FINISH) {
+                    console.log('FINISH!!!!');
+                }
             }
         }.bind(this));
 
@@ -185,17 +217,16 @@
 
         this.ball.position.y += gravity.y;
         this.mazeData.forEach(function (value, index) {
-            if (collision || value !== 1) {
+            if (collision || value !== Maze.WALL) {
                 return;
             }
 
-            var size = Math.sqrt(this.mazeData.length);
-            var pixelSize = this.size.width / size;
+            var pixelSize = this.size.width / this.mazeSize;
             var originX = -this.size.width / 2;
             var originY = -this.size.height / 2;
 
-            var x = index % size;
-            var y = Math.floor(index / size);
+            var x = index % this.mazeSize;
+            var y = Math.floor(index / this.mazeSize);
 
             var other = {
                 size: {width: pixelSize, height: pixelSize},
@@ -206,11 +237,26 @@
             }
             if (this.ball.collidesWith(other)) {
                 collision = true;
+
+                if (value === Maze.FINISH) {
+                    console.log('FINISH!!!!');
+                }
             }
         }.bind(this));
 
         if (collision) {
             this.ball.position.y = previousPosition.y;
+        }
+
+        // Add "visited" path
+        var pixelSize = this.size.width / this.mazeSize;
+        var x = Math.floor((this.ball.position.x + this.size.width / 2) / pixelSize);
+        var y = Math.floor((this.ball.position.y + this.size.width / 2) / pixelSize);
+        var index = y * this.mazeSize + x;
+
+        if (this.mazeData[index] !== Maze.VISITED) {
+            this.mazeData[index] = Maze.VISITED;
+            this.dirty = true;
         }
     }
 
